@@ -1,10 +1,7 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
+
 
 namespace ConsoleApp1
 {
@@ -17,27 +14,20 @@ namespace ConsoleApp1
     }
     class Program
     {
-        private const string URL = "http://stockprice.vn/f/df.asmx/do";
+        
 
-        static async Task Main()
+        static async Task Main(string[] args)
         {
-            customObj customObj = new customObj() { a = "3", p = new List<Object> { "HVN", 1611240299, 0 }};
+            DateTime date = new DateTime();
+            date = DateTime.Now;
+            string Filename = "D:/" + date.Year + "." + date.Month + "." + date.Day + "data";
 
-            var jSonData = JsonConvert.SerializeObject(customObj);
+            await ReadAPI.PostHTTP();
 
-            using (var httpClient = new HttpClient())
-            {
-                httpClient.BaseAddress = new Uri("http://stockprice.vn/f/df.asmx/do");
 
-                httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                HttpResponseMessage response = await httpClient.PostAsync(URL, new StringContent(jSonData, Encoding.UTF8, "application/json"));
-
-                string responseBody = await response.Content.ReadAsStringAsync();
-
-                Console.WriteLine(responseBody);
-                Console.ReadLine();
-            }
+            ExportToSQL.ExportToSQLFromTable(await ReadAPI.PostHTTP());
+            Console.WriteLine("finished!");
+            Console.ReadKey();
         }
-    }
+    }      
 }
